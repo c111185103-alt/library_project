@@ -1,0 +1,196 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>圖書館讀者服務中心</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        body { background-color: #f4f6f9; padding: 20px; }
+        .card { margin-bottom: 20px; box-shadow: 0 4px 6px rgba(0,0,0,0.05); }
+        #chat-box { height: 350px; overflow-y: auto; border: 1px solid #dee2e6; padding: 15px; background: #fff; border-radius: 5px; }
+        .message { margin-bottom: 12px; }
+        .user-container { text-align: right; }
+        .user-msg { color: #fff; background: #0d6efd; padding: 8px 12px; border-radius: 15px 15px 0 15px; display: inline-block; max-width: 70%; }
+        .ai-msg { color: #212529; text-align: left; background: #e9ecef; padding: 8px 12px; border-radius: 15px 15px 15px 0; display: inline-block; max-width: 70%; }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <div class="d-flex justify-content-between align-items-center my-4">
+        <h2 class="fw-bold m-0">📖 圖書館讀者服務中心</h2>
+        <a href="/library-admin/" class="btn btn-outline-dark fw-bold">切換至管理員後台 ➡️</a>
+    </div>
+    
+    <div class="card card-body">
+        <div class="d-flex justify-content-between align-items-end mb-3">
+            <h4 class="card-title text-primary fw-bold m-0">📚 目前館藏書單 (可在此借還)</h4>
+            <div class="input-group" style="max-width: 400px;">
+                <input type="text" id="search-isbn" class="form-control" placeholder="輸入 ISBN 碼搜尋..." onkeydown="if(event.key==='Enter') searchByISBN()">
+                <button class="btn btn-primary fw-bold" onclick="searchByISBN()">搜尋</button>
+                <button class="btn btn-outline-secondary fw-bold" onclick="loadBooks()">顯示全部</button>
+            </div>
+        </div>
+
+        <table class="table table-bordered table-hover align-middle">
+            <thead class="table-light">
+                <tr>
+                    <th style="width: 10%;">ID</th>
+                    <th style="width: 45%;">書名 / 作者 / ISBN</th>
+                    <th style="width: 25%;">狀態與期限</th>
+                    <th style="width: 20%;">操作</th>
+                </tr>
+            </thead>
+            <tbody id="book-list-tbody"></tbody>
+        </table>
+    </div>
+
+    <div class="card card-body">
+        <h4 class="card-title text-success fw-bold mb-3">🤖 智慧 AI 客服中心</h4>
+        <div id="chat-box" class="mb-3">
+            <div class="message"><strong class="text-secondary">🤖 AI 客服：</strong><br><span class="ai-msg">您好！我是圖書館 AI 智慧助理。請問想找什麼書？</span></div>
+        </div>
+        <div class="input-group">
+            <input type="text" id="user-input" class="form-control" placeholder="輸入你想詢問的問題..." onkeydown="if(event.key==='Enter') sendMessage()">
+            <button class="btn btn-success fw-bold" onclick="sendMessage()">發送訊息</button>
+        </div>
+    </div>
+</div>
+
+<script>
+    const API_BASE = '/api/';
+
+    window.onload = function() { loadBooks(); };
+
+    async function loadBooks() {
+        try {
+            document.getElementById('search-isbn').value = '';
+            // 同時抓取書單與借閱紀錄
+            const [bookRes, recordRes] = await Promise.all([
+                fetch(`${API_BASE}books/`),
+                fetch(`${API_BASE}records/`)
+            ]);
+            const books = await bookRes.json();
+            const records = await recordRes.json();
+
+            // 建立「未歸還紀錄」的對照表
+            const activeRecords = {};
+            records.forEach(r => {
+                if (!r.return_date && r.book) {
+                    activeRecords[r.book] = r; 
+                }
+            });
+
+            renderBooks(books, activeRecords);
+        } catch (e) { console.error("載入失敗:", e); }
+    }
+
+    async function searchByISBN() {
+        const query = document.getElementById('search-isbn').value.trim();
+        if (!query) return loadBooks();
+        try {
+            const [bookRes, recordRes] = await Promise.all([fetch(`${API_BASE}books/`), fetch(`${API_BASE}records/`)]);
+            const books = await bookRes.json();
+            const records = await recordRes.json();
+            
+            const filteredBooks = books.filter(b => b.isbn && b.isbn.includes(query));
+            
+            const activeRecords = {};
+            records.forEach(r => { if (!r.return_date && r.book) activeRecords[r.book] = r; });
+            
+            renderBooks(filteredBooks, activeRecords);
+        } catch (e) { console.error("搜尋失敗:", e); }
+    }
+
+    function renderBooks(books, activeRecords) {
+        const tbody = document.getElementById('book-list-tbody');
+        tbody.innerHTML = '';
+
+        if (books.length === 0) {
+            tbody.innerHTML = '<tr><td colspan="4" class="text-center text-danger fw-bold py-3">找不到符合此 ISBN 的書籍</td></tr>';
+            return;
+        }
+
+        books.forEach(book => {
+            let dueDateHtml = '';
+            // 如果書被借走，且有找到對應的借閱紀錄，顯示歸還期限
+            if (!book.is_available && activeRecords[book.id]) {
+                const dueDate = new Date(activeRecords[book.id].due_date).toLocaleDateString('zh-TW');
+                dueDateHtml = `<br><small class="text-danger fw-bold">應還日: ${dueDate}</small>`;
+            }
+
+            const statusBadge = book.is_available 
+                ? '<span class="badge bg-success-subtle text-success fw-bold">可借閱</span>' 
+                : `<span class="badge bg-danger-subtle text-danger fw-bold">已借出</span>${dueDateHtml}`;
+            
+            const actionBtn = book.is_available
+                ? `<button class="btn btn-primary btn-sm fw-bold" onclick="borrowBook(${book.id})">借書</button>`
+                : `<button class="btn btn-warning btn-sm fw-bold" onclick="returnBook(${book.id})">還書</button>`;
+
+            const isbnDisplay = book.isbn ? `<br><small class="text-secondary">ISBN: ${book.isbn}</small>` : '';
+
+            tbody.innerHTML += `
+                <tr>
+                    <td>${book.id}</td>
+                    <td><strong>${book.title}</strong><br><small class="text-muted">作者：${book.author}</small>${isbnDisplay}</td>
+                    <td>${statusBadge}</td>
+                    <td>${actionBtn}</td>
+                </tr>
+            `;
+        });
+    }
+
+    async function borrowBook(id) {
+        const name = prompt('請輸入您的借閱人姓名：');
+        if (!name) return;
+        try {
+            // 同時送出 user_name 與 reader_name 確保後端絕對抓得到
+            const response = await fetch(`${API_BASE}books/${id}/borrow/`, { 
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ user_name: name, reader_name: name }) 
+            });
+            const data = await response.json();
+            alert(data.message || data.error || '操作完成');
+            const query = document.getElementById('search-isbn').value.trim();
+            if (query) searchByISBN(); else loadBooks();
+        } catch (e) { alert('連線失敗'); }
+    }
+
+    async function returnBook(id) {
+        try {
+            const response = await fetch(`${API_BASE}books/${id}/return_book/`, { method: 'POST' });
+            const data = await response.json();
+            alert(data.message || data.error || '操作完成');
+            const query = document.getElementById('search-isbn').value.trim();
+            if (query) searchByISBN(); else loadBooks();
+        } catch (e) { alert('連線失敗'); }
+    }
+
+    async function sendMessage() {
+        const input = document.getElementById('user-input');
+        const text = input.value.trim();
+        if (!text) return;
+
+        const chatBox = document.getElementById('chat-box');
+        chatBox.innerHTML += `<div class="message user-container"><strong class="text-primary">👤 您：</strong><br><span class="user-msg">${text}</span></div>`;
+        input.value = '';
+        chatBox.scrollTop = chatBox.scrollHeight;
+
+        try {
+            const response = await fetch(`${API_BASE}chatbot/`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ message: text })
+            });
+            const data = await response.json();
+            chatBox.innerHTML += `<div class="message"><strong>🤖 AI 客服：</strong><br><span class="ai-msg">${data.reply || data.error}</span></div>`;
+        } catch (e) {
+            chatBox.innerHTML += `<div class="message"><strong class="text-danger">🤖 AI 客服：</strong><br><span class="ai-msg text-danger">連線失敗。</span></div>`;
+        }
+        chatBox.scrollTop = chatBox.scrollHeight;
+    }
+</script>
+</body>
+</html>

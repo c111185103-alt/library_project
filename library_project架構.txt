@@ -1,0 +1,9 @@
+library_project/
+├── core/                   # Django 專案主設定資料夾 (settings.py, urls.py)
+├── library/                # 圖書館功能核心 App
+│   ├── models.py           # 資料庫結構 (Book, BorrowRecord)
+│   ├── views.py            # 視圖與 API 邏輯 (包含 Gemini 串接與 RAG 實作)
+│   └── templates/          # Web 前端 HTML 檔案
+├── db.sqlite3              # 本機資料庫
+├── manage.py               # Django 專案管理工具
+└── ngrok.exe               # 外網穿透工具
