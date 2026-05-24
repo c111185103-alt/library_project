@@ -1,1 +1,0 @@
-& "C:\Users\hsing_h7p0uel\AppData\Local\Programs\Python\Python311\python.exe" manage.py runserver
