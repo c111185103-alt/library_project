@@ -67,7 +67,7 @@ class BorrowRecordViewSet(viewsets.ModelViewSet):
 
 
 # ==========================================
-# 2. AI 客服中心 (2026年 Gemini 2.0 最新官方標準格式)
+# 2. AI 客服中心
 # ==========================================
 class ChatbotView(APIView):
     def post(self, request):
@@ -89,14 +89,14 @@ class ChatbotView(APIView):
         # ⚠️ 金鑰 
         gemini_key = "My API Key" 
         
-        # 🌟 關鍵終極修正：改用 Google 當前真正存活的 Gemini 2.0 Flash 模型！
+        # 🌟 關鍵修正：改用 Google gemini-3.5-flash 模型！
         api_url = f"https://generativelanguage.googleapis.com/v1beta/models/gemini-3.5-flash:generateContent?key={gemini_key}"
         
         headers = {
             "Content-Type": "application/json"
         }
         
-        # 嚴謹的 Payload 結構
+        # Payload 結構
         payload = {
             "system_instruction": {
                 "parts": [{"text": system_instruction_text}]
