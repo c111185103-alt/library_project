@@ -11,7 +11,7 @@
 
 本專案為一套結合 Web 前端介面與 AI 人工智慧的「線上簡易圖書館管理系統」。不僅實作了基礎的館藏與借閱管理功能，更導入了 **LLM (大型語言模型)** 與 **RAG (檢索增強生成)** 技術，打造出具備「即時館藏感知」能力的 AI 智慧客服中心。
 
-本系統兼具實用性與現代化架構，並透過 `ngrok` 實作內網穿透，使本機伺服器可直接佈署至網際網路供遠端存取與展示。
+本系統兼具實用性與現代化架構，並透過 "ngrok" 實作內網穿透，使本機伺服器可直接佈署至網際網路供遠端存取與展示。
 
 ---
 
@@ -23,7 +23,7 @@
 * **⏰ 借書期限與逾期管理：** 系統自動計算借閱期限，並醒目標示**逾期 (Overdue)** 狀態。
 
 ### 2. AI 智慧客服中心 (AI Chatbot with RAG)
-* **🧠 LLM 串接：** 整合 Google **Gemini 1.5 Flash** 語言模型，提供自然流暢的文字客服體驗。
+* **🧠 LLM 串接：** 整合 Google **Gemini 3.5-Flash** 語言模型，提供自然流暢的文字客服體驗。
 * **🔍 RAG 技術導入：** AI 在回覆前會先檢索本機資料庫 (SQLite) 中的「即時館藏清單」與「借閱狀態」作為提示詞背景 (Context)，確保 AI 能準確回答「某本書現在能不能借」等具體問題，拒絕 AI 幻覺。
 * **🛡️ 容錯備援機制：** 具備完善的 API 錯誤捕捉。若遭遇網路斷線或金鑰失效，系統會自動切換至「在地端模式」，依然能為使用者列出當前館藏狀態。
 
@@ -34,8 +34,8 @@
 * **後端框架：** Python 3.11, Django, Django REST Framework
 * **前端介面：** HTML / CSS / JavaScript (搭配 Django Templates)
 * **資料庫：** SQLite (內建輕量化關聯式資料庫)
-* **AI API：** Google Generative AI (Gemini 1.5 Flash)
-* **網路通訊：** ngrok (用於將本機 `127.0.0.1:8000` 映射至公網)
+* **AI API：** Google Generative AI (Gemini 3.5-Flash)
+* **網路通訊：** ngrok (用於將本機 "127.0.0.1:8000" 映射至網際網路"http://localhost:8000")
 
 ---
 
@@ -43,5 +43,5 @@
 
 ### 1. 安裝必要套件
 請確保系統已安裝 Python，並在終端機 (PowerShell) 執行以下指令安裝依賴套件：
-```bash
+'''bash
 pip install django djangorestframework requests
