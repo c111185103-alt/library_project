@@ -86,8 +86,8 @@ class ChatbotView(APIView):
             f"【即時館藏資料庫小抄】:\n{book_context}"
         )
 
-        # ⚠️ 這是你的金鑰 
-        gemini_key = "AIzaSyDvWI7lA9F6WyWRH_KSmaRUuCRlrqgxK2s" 
+        # ⚠️ 金鑰 
+        gemini_key = "My API Key" 
         
         # 🌟 關鍵終極修正：改用 Google 當前真正存活的 Gemini 2.0 Flash 模型！
         api_url = f"https://generativelanguage.googleapis.com/v1beta/models/gemini-3.5-flash:generateContent?key={gemini_key}"
