@@ -1,3 +1,4 @@
+```markdown
 # 線上簡易圖書館管理系統 (Smart Library Management System)
 
 > **國立高雄科技大學 電子工程系 研究所專案報告**
@@ -18,20 +19,18 @@
 ## 核心功能 (Key Features)
 
 ### 1. 基礎圖書館管理 (Library Management)
-* **書籍清單展示：** Web 介面即時呈現館內所有書籍狀態。
-* **借還書紀錄：** 完整追蹤書籍的借出與歸還歷程。
-* **借書期限與逾期管理：** 系統自動計算借閱期限，並醒目標示 **逾期 (Overdue)** 狀態。
-
----
+* **📚 書籍清單展示：** Web 介面即時呈現館內所有書籍狀態。
+* **🔄 借還書紀錄：** 完整追蹤書籍的借出與歸還歷程，包含精確至秒級的時間戳記。
+* **⏰ 借書期限與逾期管理：** 系統自動計算借閱期限。為配合展演需求，內建「1分鐘極速逾期」機制，時間一到系統將動態標示 **⚠️ 逾期 (Overdue)** 警示。
 
 ### 2. AI 智慧客服中心 (AI Chatbot with RAG)
-* **LLM 串接：** 整合 Google **Gemini 3.5-Flash** 語言模型，提供自然流暢的文字客服體驗。
-* **RAG 技術導入：** AI 在回覆前會先檢索本機資料庫 (SQLite) 中的「即時館藏清單」與「借閱狀態」作為提示詞背景 (Context)，確保 AI 能準確回答「某本書現在能不能借」等具體問題，拒絕 AI 幻覺。
-* **容錯備援機制：** 具備完善的 API 錯誤捕捉。若遭遇網路斷線或金鑰失效，系統會自動切換至「在地端模式」，依然能為使用者列出當前館藏狀態。
+* **🤖 LLM 串接：** 整合 Google **Gemini 3.5-Flash** 語言模型，提供自然流暢的文字客服體驗。
+* **🧠 RAG 技術導入：** AI 在回覆前會先檢索本機資料庫 (SQLite) 中的「即時館藏清單」與「借閱狀態」作為提示詞背景 (Context)，確保 AI 能準確回答「某本書現在能不能借」等具體問題，拒絕 AI 幻覺。
+* **🛡️ 容錯備援機制：** 具備完善的 API 錯誤捕捉。若遭遇外部網路連線異常或金鑰失效，系統會自動切換至「在地端模式」，依然能為使用者列出當前館藏狀態。
 
 ---
 
-## 技術架構 (Tech Stack)
+## 🛠️ 技術架構 (Tech Stack)
 
 * **後端框架：** Python 3.11, Django, Django REST Framework (DRF)
 * **前端介面：** HTML5, Bootstrap 5, JavaScript (Fetch API)
@@ -65,14 +64,45 @@ Library_System/                 # 專案根目錄
 │
 ├── db.sqlite3                  # 本機開發用關聯式資料庫
 ├── manage.py                   # Django 專案管理命令列工具
-├── requirements.txt            # Python 依賴套件清單 (可選)
 └── README.md                   # 專案說明文件
+
+```
 
 ---
 
-## 環境建置與執行指南 (Installation & Setup)                                      
+## 環境建置與執行指南 (Installation & Setup)
 
 ### 1. 安裝必要套件
-請確保系統已安裝 Python 3.11+，並在終端機執行以下指令安裝依賴套件：
+
+請確保系統已安裝 Python 3.x，並在終端機執行以下指令安裝依賴套件：
+
 ```bash
 pip install django djangorestframework google-generativeai requests
+
+```
+
+### 2. 啟動 Django 地端伺服器
+
+於專案根目錄下（`manage.py` 所在目錄）開啟終端機，執行以下指令：
+
+```bash
+python manage.py runserver
+
+```
+
+* 啟動成功後，請開啟瀏覽器前往本機端網址：`http://127.0.0.1:8000/`
+
+### 3. 啟動 ngrok 網路穿透 (跨網域連線展示)
+
+若需將本機伺服器映射至網際網路（例如使用手機 4G 網路進行測試），請另開一個終端機視窗並執行：
+
+```bash
+ngrok http 8000
+
+```
+
+* 執行後，請複製終端機畫面上顯示的 `Forwarding` 網址（例如 `https://8000.ngrok-free.app`），即可透過該網址從外部裝置連入系統。
+
+```
+
+```
