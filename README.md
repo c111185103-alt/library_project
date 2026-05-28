@@ -1,4 +1,3 @@
-```markdown
 # 線上簡易圖書館管理系統 (Smart Library Management System)
 
 > **國立高雄科技大學 電子工程系 研究所專案報告**
