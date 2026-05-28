@@ -31,7 +31,7 @@
 
 ---
 
-## 🛠️ 技術架構 (Tech Stack)
+## 技術架構 (Tech Stack)
 
 * **後端框架：** Python 3.11, Django, Django REST Framework (DRF)
 * **前端介面：** HTML5, Bootstrap 5, JavaScript (Fetch API)
@@ -41,7 +41,7 @@
 
 ---
 
-## 📂 專案架構 (Project Structure)
+## 專案架構 (Project Structure)
 
 本專案採用 Django 標準的 MTV (Model-Template-View) 架構設計，主要目錄結構如下：
 
